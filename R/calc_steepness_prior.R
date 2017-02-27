@@ -8,7 +8,7 @@
 #' @export
 calc_steepness_prior <-
 function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=rep(1,ncol(LogLike_zp)),
-    Downweight_outliers=1, Remove_at_bounds=FALSE, NburnIn=1e6, Nsamp=1e6, Nthin=1e2, RunDir=paste0(getwd(),"/"),
+    Downweight_outliers=1, Remove_at_bounds=FALSE, NburnIn=1e6, Nsamp=1e6, Nthin=1e2, RunDir=getwd(),
     AdmbDir=system.file("executables",package="SebastesSteepness") ){
 
   ################
@@ -66,42 +66,42 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   dir.create(RunDir)
   RunCommand = "profile_mc_JTT_v2"
 
-  write(c("#Nstocks",ncol(LogLikeInterp_zp)), file=paste0(RunDir,RunCommand,".dat"))
-  write(c("#Nprofile",nrow(LogLikeInterp_zp)), file=paste0(RunDir,RunCommand,".dat"), append=TRUE)
-  write("#h_profX", file=paste0(RunDir,RunCommand,".dat"), append=TRUE)
-  write.table(matrix(hInterp_z,nrow=1), file=paste0(RunDir,RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
-  write("#StockWeight", file=paste0(RunDir,RunCommand,".dat"), append=TRUE)
-  write.table(matrix(StockWeight,nrow=1), file=paste0(RunDir,RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
-  write("#h_profY", file=paste0(RunDir,RunCommand,".dat"), append=TRUE)  # NLL
-  write.table(-1*t(LogLikeInterp_zp), file=paste0(RunDir,RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
-  if(Version=="Thorson") write(c("#TestVal",123456), file=paste0(RunDir,RunCommand,".dat"), append=TRUE)
+  write(c("#Nstocks",ncol(LogLikeInterp_zp)), file=paste0(RunDir,"/",RunCommand,".dat"))
+  write(c("#Nprofile",nrow(LogLikeInterp_zp)), file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
+  write("#h_profX", file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
+  write.table(matrix(hInterp_z,nrow=1), file=paste0(RunDir,"/",RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
+  write("#StockWeight", file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
+  write.table(matrix(StockWeight,nrow=1), file=paste0(RunDir,"/",RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
+  write("#h_profY", file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)  # NLL
+  write.table(-1*t(LogLikeInterp_zp), file=paste0(RunDir,"/",RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
+  if(Version=="Thorson") write(c("#TestVal",123456), file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
 
   # Run ADMB
-  file.copy(from=paste0(AdmbDir,RunCommand,".exe"), to=paste0(RunDir,RunCommand,".exe"), overwrite=TRUE)
+  file.copy(from=paste0(AdmbDir,"/",RunCommand,".exe"), to=paste0(RunDir,"/",RunCommand,".exe"), overwrite=TRUE)
   setwd(RunDir)
   shell(RunCommand)
 
   # Read in diagnostics
-  Par = scan(file=paste0(RunDir,RunCommand,".par"),comment.char="#") # ,what="character"
-  Beta = scan(file=paste0(RunDir,RunCommand,".rep"),skip=9,nlines=1)
-  Jacob = scan(file=paste0(RunDir,RunCommand,".rep"),skip=11,nlines=1)
-  h_profX = scan(file=paste0(RunDir,RunCommand,".rep"),skip=13,nlines=1)
-  h_profY = matrix(scan(file=paste0(RunDir,RunCommand,".rep"),skip=15,nlines=ncol(LogLikeInterp_zp)), nrow=ncol(LogLikeInterp_zp), byrow=TRUE)
-  LikeMat = matrix(scan(file=paste0(RunDir,RunCommand,".rep"),skip=15+ncol(LogLikeInterp_zp)+1,nlines=ncol(LogLikeInterp_zp)), nrow=ncol(LogLikeInterp_zp), byrow=TRUE)
+  Par = scan(file=paste0(RunDir,"/",RunCommand,".par"),comment.char="#") # ,what="character"
+  Beta = scan(file=paste0(RunDir,"/",RunCommand,".rep"),skip=9,nlines=1)
+  Jacob = scan(file=paste0(RunDir,"/",RunCommand,".rep"),skip=11,nlines=1)
+  h_profX = scan(file=paste0(RunDir,"/",RunCommand,".rep"),skip=13,nlines=1)
+  h_profY = matrix(scan(file=paste0(RunDir,"/",RunCommand,".rep"),skip=15,nlines=ncol(LogLikeInterp_zp)), nrow=ncol(LogLikeInterp_zp), byrow=TRUE)
+  LikeMat = matrix(scan(file=paste0(RunDir,"/",RunCommand,".rep"),skip=15+ncol(LogLikeInterp_zp)+1,nlines=ncol(LogLikeInterp_zp)), nrow=ncol(LogLikeInterp_zp), byrow=TRUE)
 
   # Run MCMC
   Files2Remove = c("mu.out","tau.out",paste0(RunCommand,".psv"))
   if( any(Files2Remove %in% list.files(RunDir)) ){
-    file.remove( paste0(RunDir,Files2Remove[Files2Remove %in% list.files(RunDir)]) )
+    file.remove( paste0(RunDir,"/",Files2Remove[Files2Remove %in% list.files(RunDir)]) )
   }
   rm(list=c("Mu","Sd_beta")[c("Mu","Sd_beta")%in%ls()])
   shell(paste0(RunCommand," -mcmc ",NburnIn," -mcscale ",NburnIn))
   shell(paste0(RunCommand," -mcr -mcmc ",Nsamp," -mcsave ",Nthin))
   shell(paste0(RunCommand," -mceval"))
 
-  Mu = scan(paste0(RunDir,"mu.out"))
+  Mu = scan(paste0(RunDir,"/mu.out"))
   Mu_h = plogis(Mu)*0.8+0.2
-  Sd_beta = scan(paste0(RunDir,"tau.out"))
+  Sd_beta = scan(paste0(RunDir,"/tau.out"))
     mean(Sd_beta); calc_mode(Sd_beta)
   Pred_h = plogis(rnorm(length(Mu), mean=Mu, sd=Sd_beta))*0.8 + 0.2
     mean(Pred_h); calc_mode(Pred_h)
@@ -115,7 +115,7 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   ################
 
   # Plot results
-  png(file=paste0(RunDir,"Results.png"), width=8,height=8,res=200,units="in")
+  png(file=paste0(RunDir,"/Results.png"), width=8,height=8,res=200,units="in")
     par( par_fn(4) )
     hist(Mu_h, breaks=seq(0.2,1,by=0.05),main="Mu_h_Post")
     hist(Sd_beta, breaks=seq(0,max(Sd_beta)+0.05,by=0.05),main="Sd_beta_Post")
@@ -127,7 +127,7 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
 
   ##### Convergence diagnostics
   # Save Trace
-  png(paste0(RunDir,"Trace.png"),width=2*2,height=2*1,units="in",res=200)
+  png(paste0(RunDir,"/Trace.png"),width=2*2,height=2*1,units="in",res=200)
     par(mfrow=c(1,2), mar=c(0,1,1,0),mgp=c(1.25,0.25,0),tck=-0.02)
     for(ParI in 1:2){
       matplot(cbind(Mu_h,Sd_beta)[,ParI],type="l",xaxt="n",main=c("Mu_h","Sd_beta")[ParI]) # , ylim=c(0,min(5,max(Derived[seq(1,nrow(Derived),length=1000),ParI,])))
@@ -135,7 +135,7 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   dev.off()   #-0.295287  , 0.247201
 
   # Save Autocorrelation
-  png(paste0(RunDir,"ACF.png"),width=2*2,height=2*1,units="in",res=200)
+  png(paste0(RunDir,"/ACF.png"),width=2*2,height=2*1,units="in",res=200)
     par(mfrow=c(1,2), mar=c(0,1,1,0),mgp=c(1.25,0.25,0),tck=-0.02)
     for(ParI in 1:2){
       Acf = apply(cbind(Mu_h,Sd_beta)[,ParI,drop=FALSE],MARGIN=2,FUN=function(Vec){acf(Vec,plot=FALSE)$acf})
