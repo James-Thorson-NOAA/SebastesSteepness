@@ -74,7 +74,7 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   write.table(matrix(StockWeight,nrow=1), file=paste0(RunDir,"/",RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
   write("#h_profY", file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)  # NLL
   write.table(-1*t(LogLikeInterp_zp), file=paste0(RunDir,"/",RunCommand,".dat"), row.names=FALSE, col.names=FALSE, append=TRUE)
-  if(Version=="Thorson") write(c("#TestVal",123456), file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
+  write(c("#TestVal",123456), file=paste0(RunDir,"/",RunCommand,".dat"), append=TRUE)
 
   # Run ADMB
   file.copy(from=paste0(AdmbDir,"/",RunCommand,".exe"), to=paste0(RunDir,"/",RunCommand,".exe"), overwrite=TRUE)
@@ -146,4 +146,8 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
       }
     }
   dev.off()   #-0.295287  , 0.247201
+
+  # Return stuff
+  Return = list( "hpred"=Pred_h, "Mean_hpred"=mean(Pred_h), "SD_hpred"=sd(Pred_h) )
+  return( Return )
 }
