@@ -1,0 +1,9 @@
+Package: SebastesSteepness
+Type: Package
+Title: Calculate prior for steepness
+Version: 1.0
+Date: 2017-02-27
+Author: James Thorson
+Maintainer: James Thorson <James.Thorson@noaa.gov>
+Description: SebastesSteepness is used to generate a prior for steepness for West Coast rockfishes, using likelihood profiles for multiple assessed rockfishes.
+License: GPL-2
