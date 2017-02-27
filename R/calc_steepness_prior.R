@@ -148,6 +148,6 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   dev.off()   #-0.295287  , 0.247201
 
   # Return stuff
-  Return = list( "hpred"=Pred_h, "Mean_hpred"=mean(Pred_h), "SD_hpred"=sd(Pred_h) )
-  return( Return )
+  Return = list( "hpred"=Pred_h, "Mean_hpred"=mean(Pred_h), "SD_hpred"=sd(Pred_h), "LogLikeInterp_zp"=LogLikeInterp_zp, "hInterp_z"=hInterp_z )
+  return( invisible(Return) )
 }
