@@ -9,7 +9,7 @@
 calc_steepness_prior <-
 function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=rep(1,ncol(LogLike_zp)),
     Downweight_outliers=1, Remove_at_bounds=FALSE, NburnIn=1e6, Nsamp=1e6, Nthin=1e2, RunDir=getwd(),
-    AdmbDir=system.file("executables",package="SebastesSteepness") ){
+    AdmbDir=system.file("executables",package="SebastesSteepness"), h_quantiles=c(0.05,0.25,0.5,0.75,0.95,seq(0.025,0.975,by=0.05)) ){
 
   ################
   # Local functions
@@ -148,6 +148,7 @@ function( LogLike_zp, h_z, Interpolate=TRUE, Degree=1, Ninterp=203, StockWeight=
   dev.off()   #-0.295287  , 0.247201
 
   # Return stuff
-  Return = list( "hpred"=Pred_h, "Mean_hpred"=mean(Pred_h), "SD_hpred"=sd(Pred_h), "LogLikeInterp_zp"=LogLikeInterp_zp, "hInterp_z"=hInterp_z )
+  Quantiles = quantile( Pred_h, probs=h_quantiles )
+  Return = list( "hpred"=Pred_h, "Mean_hpred"=mean(Pred_h), "Quantiles"=Quantiles, "SD_hpred"=sd(Pred_h), "LogLikeInterp_zp"=LogLikeInterp_zp, "hInterp_z"=hInterp_z )
   return( invisible(Return) )
 }
