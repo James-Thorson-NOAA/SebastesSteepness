@@ -1,0 +1,24 @@
+---
+title: "Tutorial"
+author: "James Thorson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Description
+
+`SebastesSteepness` is an R package for generating a prior distribution for recruitment compensation (measured by the steepness parameter of the Beverton-Holt stock-recruit function) for West Coast rockfishes, used in 6 assessment cyles 2007, 2009, 2011, 2013, 2015, and 2017. 
+
+
+# Description of package
+
+If using the software or predictions please cite:
+
+* Thorson, J. T., Dorn, M., and Hamel, O. S. In preparation. Steepness for West Coast rockfishes:  Results from a twelve-year experiment in iterative regional meta-analysis.
+
+for further information regarding life-history predictions currently available in FishBase.  
+
