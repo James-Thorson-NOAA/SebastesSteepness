@@ -7,3 +7,6 @@ Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Description: SebastesSteepness is used to generate a prior for steepness for West Coast rockfishes, using likelihood profiles for multiple assessed rockfishes.
 License: GPL-3
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
