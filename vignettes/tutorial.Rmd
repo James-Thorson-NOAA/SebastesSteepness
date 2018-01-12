@@ -1,58 +1,48 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Tutorial"
+author: "James Thorson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+# Description
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+`SebastesSteepness` is an R package for generating a prior distribution for recruitment compensation (measured by the steepness parameter of the Beverton-Holt stock-recruit function) for West Coast rockfishes, used in 6 assessment cyles occurring in 2007, 2009, 2011, 2013, 2015, and 2017. 
 
-## Vignette Info
+# To replicate previous results
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+`SebastesSteepness` is intended to improve reproducibility by compiling past data and analytical code.  For example to replicate 2017 results please run
 
-## Styles
+```{r, warning=FALSE}
+# Load 2017 data
+data(profile_2017, package="SebastesSteepness")
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+# Re-run results
+Return = SebastesSteepness::calc_steepness_prior( LogLike_zp=-1*profile_2017$negloglike, h_z=profile_2017$steepness_value, StockWeight=profile_2017$stock_weight, RunDir=paste0(getwd(),"/"), NburnIn=1e4, Nsamp=1e4, Nthin=1e0 )
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+# visualize results
+hist( Return$hpred, breaks=seq(0.2,1.0,by=0.04), plot=TRUE, main="Predictive distribution", xlab="Steepness", ylab="")
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+where the predictive mean for 2017 is `r formatC(mean(Return$hpred),digits=3,format="f")` and predictive standard deviation is `r formatC(sd(Return$hpred),digits=3,format="f")`
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+# To use for new data
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+`SebastesSteepness` can also be used to generate a steepness profile given future data sets.  To do so, include the negative log-likelihood, stock weighting, and steepness values (correponding to rows of the negative-loglikelihood table) in similar format to the included data examples.  Then use the same code as above.
 
-## More Examples
+# To generate Type-C priors
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+Finally, analysts might want a prior that is developed without using data for a given species.  To do so, remove the corrresponding column from a data set, e.g., `profile_2017$negloglike`, and the corresponding entry from `profile_2017$stock_weight`.
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
+# Description of package
 
-Also a quote using `>`:
+If using the software or predictions please cite:
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+* Thorson, J. T., Dorn, M., and Hamel, O. S. In preparation. Steepness for West Coast rockfishes:  Results from a twelve-year experiment in iterative regional meta-analysis.
+
+for further information regarding life-history predictions currently available in FishBase.  
+
