@@ -15,20 +15,20 @@ vignette: >
 
 # To replicate previous results
 
-`SebastesSteepness` is intended to improve reproducibility by compiling past data and analytical code.  For example to replicate 2017 results please run
+`SebastesSteepness` is intended to improve reproducibility by compiling past data and analytical code.  For example to replicate 2017 results using a short MCMC chain please run
 
 ```{r, warning=FALSE}
 # Load 2017 data
 data(profile_2017, package="SebastesSteepness")
 
 # Re-run results
-Return = SebastesSteepness::calc_steepness_prior( LogLike_zp=-1*profile_2017$negloglike, h_z=profile_2017$steepness_value, StockWeight=profile_2017$stock_weight, RunDir=paste0(getwd(),"/"), NburnIn=1e4, Nsamp=1e4, Nthin=1e0 )
+Return = SebastesSteepness::calc_steepness_prior( LogLike_zp=-1*profile_2017$negloglike, h_z=profile_2017$steepness_value, StockWeight=profile_2017$stock_weight, RunDir=paste0(getwd(),"/"), NburnIn=1e5, Nsamp=1e5, Nthin=1e1 )
 
 # visualize results
 hist( Return$hpred, breaks=seq(0.2,1.0,by=0.04), plot=TRUE, main="Predictive distribution", xlab="Steepness", ylab="")
 ```
 
-where the predictive mean for 2017 is `r formatC(mean(Return$hpred),digits=3,format="f")` and predictive standard deviation is `r formatC(sd(Return$hpred),digits=3,format="f")`
+where the predictive mean for 2017 is `r formatC(mean(Return$hpred),digits=3,format="f")` and predictive standard deviation is `r formatC(sd(Return$hpred),digits=3,format="f")`.  For a real run, please increase the`NburnIn` and `Nsamp` to >1,000,000.  
 
 # To use for new data
 
