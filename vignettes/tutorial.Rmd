@@ -1,0 +1,48 @@
+---
+title: "Tutorial"
+author: "James Thorson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Description
+
+`SebastesSteepness` is an R package for generating a prior distribution for recruitment compensation (measured by the steepness parameter of the Beverton-Holt stock-recruit function) for West Coast rockfishes, used in 6 assessment cyles occurring in 2007, 2009, 2011, 2013, 2015, and 2017. 
+
+# To replicate previous results
+
+`SebastesSteepness` is intended to improve reproducibility by compiling past data and analytical code.  For example to replicate 2017 results using a short MCMC chain please run
+
+```{r, warning=FALSE}
+# Load 2017 data
+data(profile_2017, package="SebastesSteepness")
+
+# Re-run results
+Return = SebastesSteepness::calc_steepness_prior( LogLike_zp=-1*profile_2017$negloglike, h_z=profile_2017$steepness_value, StockWeight=profile_2017$stock_weight, RunDir=paste0(getwd(),"/"), NburnIn=1e5, Nsamp=1e5, Nthin=1e1 )
+
+# visualize results
+hist( Return$hpred, breaks=seq(0.2,1.0,by=0.04), plot=TRUE, main="Predictive distribution", xlab="Steepness", ylab="")
+```
+
+where the predictive mean for 2017 is `r formatC(mean(Return$hpred),digits=3,format="f")` and predictive standard deviation is `r formatC(sd(Return$hpred),digits=3,format="f")`.  For a real run, please increase the`NburnIn` and `Nsamp` to >1,000,000.  
+
+# To use for new data
+
+`SebastesSteepness` can also be used to generate a steepness profile given future data sets.  To do so, include the negative log-likelihood, stock weighting, and steepness values (correponding to rows of the negative-loglikelihood table) in similar format to the included data examples.  Then use the same code as above.
+
+# To generate Type-C priors
+
+Finally, analysts might want a prior that is developed without using data for a given species.  To do so, remove the corrresponding column from a data set, e.g., `profile_2017$negloglike`, and the corresponding entry from `profile_2017$stock_weight`.
+
+# Description of package
+
+If using the software or predictions please cite:
+
+* Thorson, J. T., Dorn, M., and Hamel, O. S. In preparation. Steepness for West Coast rockfishes:  Results from a twelve-year experiment in iterative regional meta-analysis.
+
+for further information regarding life-history predictions currently available in FishBase.  
+
